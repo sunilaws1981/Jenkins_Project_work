@@ -1,0 +1,49 @@
+version: '3'
+services:
+  jenkins:
+    container_name: jenkins
+    image: jenkins-ansible
+    build:
+      context: jenkins-ansible
+    mem_limit: 1g
+    ports:
+      - "8080:8080"
+    volumes:
+      - "$PWD/jenkins_data/Jenkins_home:/var/jenkins_home_container"
+    networks:
+      - net
+  remote_host:
+    container_name: remote-host
+    image: remote-host
+    mem_limit: 1g
+    build:
+      context: centos7
+    volumes:
+      - "$PWD/aws-s3.sh:/tmp/script.sh"
+    networks:
+      - net
+  db_host:
+    container_name: db
+    image: mysql:5.7
+    mem_limit: 1g
+    #command: --innodb_buffer_pool_size=1024M --innodb_read_io_threads=4
+    #command: --innodb_flush_log_at_trx_commit=2 --innodb_flush_method=O_DIRECT
+    volumes:
+      - ./db_data:/var/lib/mysql
+    environment:
+      - "MYSQL_ROOT_PASSWORD=123"
+        #- "MYSQL_DATABASE=star
+        #- "MYSQL_USER=user"
+        #- "MYSQL_PASSWORD=pass"
+        #- " MYSQL_RANDOM_ROOT_PASSWORD=yes"
+  #web:
+  #container_name: web
+  #image: ansible-web
+  #build:
+  #context: /home/jenkins/jenkins_home/jenkins-ansible/web
+  #ports:
+  #   - "80:80"
+  # networks:
+  #   - net
+networks:
+  net:
